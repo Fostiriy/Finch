@@ -6,6 +6,7 @@ public class FinchTest {
         int speed = 100;
         int distance = 50;
 
+
 //        myFinch.setBeak(100, 100, 0);
 //        myFinch.setTurn("R",45,50);
 //
