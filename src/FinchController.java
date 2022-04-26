@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
-public class FinchDo {
-	private Finch finch;
-	private State state;
-	private ArrayList<State> states;
+public class FinchController {
+	private final Finch finch;
+	private final State state;
+	private final ArrayList<State> states;
 
-	public FinchDo(Finch finch) {
+	public FinchController(Finch finch) {
 		this.finch = finch;
 		state = new State();
 		states = new ArrayList<State>();
@@ -13,28 +13,29 @@ public class FinchDo {
 
 	public void go() {
 		System.out.println("Go forward");
-		move("L", 20, 20);
-		move("R", 40, 20);
-		move("L", 80, 40);
-		move("R", 80, 40);
+		move(State.LeftDirection, 20, 20);
+		move(State.RightDirection, 40, 20);
+		move(State.LeftDirection, 80, 40);
+		move(State.RightDirection, 80, 40);
 		goBack();
 	}
 
 	public void goBack() {
 		System.out.println("Go backward");
 		state.setSpeed(100);
-		String turnDirection = states.get(states.size() - 1).turnDirection;
+		String turnDirection = states.get(states.size() - 1).getTurnDirection();
 		double angleDelta = 5;
 		double distanceDelta = 10; // На большой скорости долго тормозит и не доезжает
 		double angle = 180 + 5 * angleDelta;
-		double distance = states.get(states.size() -1).distance;
+		double distance = states.get(states.size() -1).getDistance();
 		move(turnDirection, angle, distance, false);
+
 		for (int i = states.size() - 2; i >= 0; --i) {
-			turnDirection = states.get(i).turnDirection;
-			angle = states.get(i + 1).angle;
-			if (turnDirection == "L") // Предполагаем, что погрешность на поворот влево
+			turnDirection = states.get(i).getTurnDirection();
+			angle = states.get(i + 1).getAngle();
+			if (turnDirection.equals(State.LeftDirection)) // Предполагаем, что погрешность на поворот влево
 				angle += angleDelta;
-			distance = states.get(i).distance + distanceDelta;
+			distance = states.get(i).getDistance() + distanceDelta;
 			move(turnDirection, angle, distance, false);
 		}
 	}
@@ -54,8 +55,8 @@ public class FinchDo {
 	}
 
 	private void move() {
-		finch.setTurn(state.turnDirection, state.angle, state.speed);
-		finch.setMove(state.moveDirection, state.distance, state.speed);
+		finch.setTurn(state.getTurnDirection(), state.getAngle(), state.getSpeed());
+		finch.setMove(state.getMoveDirection(), state.getDistance(), state.getSpeed());
 	}
 
 }

@@ -1,9 +1,33 @@
 public class State {
-	public String moveDirection = "F";
-	public String turnDirection;
-	public double speed;
-	public double angle;
-	public double distance;
+	public static final String forwardDirection = "F";
+	public static final String RightDirection = "R";
+	public static final String LeftDirection = "L";
+	public static final String backwardsDirection = "B";
+	private String moveDirection = "F";
+	private String turnDirection;
+	private double speed;
+	private double angle;
+	private double distance;
+
+	public String getMoveDirection() {
+		return moveDirection;
+	}
+
+	public String getTurnDirection() {
+		return turnDirection;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+
+	public double getAngle() {
+		return angle;
+	}
+
+	public double getDistance() {
+		return distance;
+	}
 
 	public State() {
 		this.moveDirection = "F";
