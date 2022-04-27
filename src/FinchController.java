@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 
-public class FinchController {
+public class FinchController implements Triggerable {
 	private final Finch finch;
 	private final State state;
 	private final ArrayList<State> states;
+	private final FinchTrigger trigger;
 
 	public FinchController(Finch finch) {
 		this.finch = finch;
 		state = new State();
 		states = new ArrayList<State>();
+		trigger = new FinchTrigger(this);
 	}
 
 	public void go() {
@@ -17,6 +19,21 @@ public class FinchController {
 		move(State.RightDirection, 40, 20);
 		move(State.LeftDirection, 80, 40);
 		move(State.RightDirection, 80, 40);
+		goBack();
+	}
+
+	public void start() {
+		System.out.println("Go recon");
+		// Thread start
+		trigger.start();
+
+		// Randomized
+		move(State.LeftDirection, 20, 20);
+		move(State.RightDirection, 40, 20);
+		move(State.LeftDirection, 80, 40);
+		move(State.RightDirection, 80, 40);
+
+		// Thread stop
 		goBack();
 	}
 
@@ -59,4 +76,14 @@ public class FinchController {
 		finch.setMove(state.getMoveDirection(), state.getDistance(), state.getSpeed());
 	}
 
+	@Override
+	public boolean checkSensor() {
+		// ПОЖАЛУЙСТВ ВСТАВЬТЕ ПРОВЕРКУ СЕНСОРА
+		return true;
+	}
+
+	@Override
+	public void trigger() {
+		// ЗАВЕРШЕНИЕ РАБОТЫ
+	}
 }
