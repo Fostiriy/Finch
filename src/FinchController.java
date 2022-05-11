@@ -10,7 +10,7 @@ public class FinchController implements Triggerable {
 		this.finch = finch;
 		state = new State();
 		states = new ArrayList<State>();
-		trigger = new FinchTrigger(this);
+		trigger = new FinchTrigger(finch);
 	}
 
 	public void go() {
@@ -27,14 +27,15 @@ public class FinchController implements Triggerable {
 		// Thread start
 		trigger.start();
 
-		// Randomized
-		move(State.LeftDirection, 20, 20);
-		move(State.RightDirection, 40, 20);
-		move(State.LeftDirection, 80, 40);
-		move(State.RightDirection, 80, 40);
-
-		// Thread stop
-		goBack();
+//		// Randomized
+//		move(State.LeftDirection, 20, 20);
+//		move(State.RightDirection, 40, 20);
+//		move(State.LeftDirection, 80, 40);
+//		move(State.RightDirection, 80, 40);
+//
+//		// Thread stop
+//		goBack();
+		go();
 	}
 
 	public void goBack() {
@@ -44,7 +45,7 @@ public class FinchController implements Triggerable {
 		double angleDelta = 5;
 		double distanceDelta = 10; // На большой скорости долго тормозит и не доезжает
 		double angle = 180 + 5 * angleDelta;
-		double distance = states.get(states.size() -1).getDistance();
+		double distance = states.get(states.size() - 1).getDistance();
 		move(turnDirection, angle, distance, false);
 
 		for (int i = states.size() - 2; i >= 0; --i) {
@@ -78,12 +79,16 @@ public class FinchController implements Triggerable {
 
 	@Override
 	public boolean checkSensor() {
-		// ПОЖАЛУЙСТВ ВСТАВЬТЕ ПРОВЕРКУ СЕНСОРА
-		return true;
+		System.out.println(finch.getLight(State.LeftDirection) + " " + finch.getLight(State.RightDirection));
+		return finch.getLight(State.LeftDirection) <= 90 && finch.getLight(State.RightDirection) <= 90;
 	}
 
 	@Override
 	public void trigger() {
-		// ЗАВЕРШЕНИЕ РАБОТЫ
+		//trigger.interrupt();
+	}
+
+	public int getLights() {
+		return finch.getLight(State.LeftDirection);
 	}
 }

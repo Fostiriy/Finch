@@ -1,16 +1,17 @@
 public class FinchTrigger extends Thread {
-    private final Triggerable controller;
+    private final Finch finch;
     private boolean isActive;
 
-    public FinchTrigger(Triggerable controller) {
-        this.controller = controller;
+    public FinchTrigger(Finch finch) {
+        this.finch = finch;
     }
 
     @Override
     public void run() {
         isActive = true;
         while (isActive) {
-            isActive = controller.checkSensor();
+            System.out.println(finch.getLight("L"));
+            //isActive = finch.checkSensor();
         }
     }
 
