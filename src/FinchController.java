@@ -1,94 +1,88 @@
 import java.util.ArrayList;
+import java.util.Random;
 
-public class FinchController implements Triggerable {
-	private final Finch finch;
-	private final State state;
-	private final ArrayList<State> states;
-	private final FinchTrigger trigger;
+public class FinchController {
+    private final Finch finch;
+    private final ArrayList<MoveCommand> commands;
 
-	public FinchController(Finch finch) {
-		this.finch = finch;
-		state = new State();
-		states = new ArrayList<State>();
-		trigger = new FinchTrigger(finch);
-	}
+    public FinchController(Finch finch) {
+        this.finch = finch;
+        commands = new ArrayList<>();
+    }
 
-	public void go() {
-		System.out.println("Go forward");
-		move(State.LeftDirection, 20, 20);
-		move(State.RightDirection, 40, 20);
-		move(State.LeftDirection, 80, 40);
-		move(State.RightDirection, 80, 40);
-		goBack();
-	}
+    public void startTest() { // Тестовый режим, Лёша писал в мейне
+        System.out.println("Go forward");
 
-	public void start() {
-		System.out.println("Go recon");
-		// Thread start
-		trigger.start();
+        int temp = 50;
+        int speed1 = 100, speed2 = 50;
+        for (int i = 0; i < temp; i++) {
+            finch.setMotors(0, speed1);
+        }
+        turnAround();
+        for (int i = 0; i < temp; i++) {
+            finch.setMotors(speed1, speed2);
+        }
 
-//		// Randomized
-//		move(State.LeftDirection, 20, 20);
-//		move(State.RightDirection, 40, 20);
-//		move(State.LeftDirection, 80, 40);
-//		move(State.RightDirection, 80, 40);
-//
-//		// Thread stop
-//		goBack();
-		go();
-	}
+        goBack();
+    }
 
-	public void goBack() {
-		System.out.println("Go backward");
-		state.setSpeed(100);
-		String turnDirection = states.get(states.size() - 1).getTurnDirection();
-		double angleDelta = 5;
-		double distanceDelta = 10; // На большой скорости долго тормозит и не доезжает
-		double angle = 180 + 5 * angleDelta;
-		double distance = states.get(states.size() - 1).getDistance();
-		move(turnDirection, angle, distance, false);
+    public void start() { // Рандомный режим
+        int maxSpeed = 100; // Типа конфиг для значений рандомайзера
+        int minSpeed = -100;
+        int maxLength = 100;
+        int minLength = 10;
 
-		for (int i = states.size() - 2; i >= 0; --i) {
-			turnDirection = states.get(i).getTurnDirection();
-			angle = states.get(i + 1).getAngle();
-			if (turnDirection.equals(State.LeftDirection)) // Предполагаем, что погрешность на поворот влево
-				angle += angleDelta;
-			distance = states.get(i).getDistance() + distanceDelta;
-			move(turnDirection, angle, distance, false);
-		}
-	}
+        System.out.println("Go recon");
+        Random random = new Random();
+        boolean isActive = true;
 
-	public void move(String turnDirection, double angle, double distance) {
-		move(turnDirection, angle, distance, true);
-	}
+        while (isActive) {
+            int length = random.nextInt(maxLength - minLength) + minLength;
+            int left = random.nextInt(maxSpeed - minSpeed) + minSpeed;
+            int right = random.nextInt(maxSpeed - minSpeed) + minSpeed;
 
-	public void move(String turnDirection, double angle, double distance, boolean saveState) {
-		state.setState(turnDirection, angle, distance);
-		if (saveState) {
-			State tempState = new State(state);
-			states.add(tempState);
-		}
-		System.out.println(state.getState());
-		move();
-	}
+            for (int i = 0; i < length; i++) {
+                finch.setMotors(left, right);
+                if (isInterrupted()) {
+                    isActive = false;
+                    length = i + 1;
+                    break;
+                }
+            }
 
-	private void move() {
-		finch.setTurn(state.getTurnDirection(), state.getAngle(), state.getSpeed());
-		finch.setMove(state.getMoveDirection(), state.getDistance(), state.getSpeed());
-	}
+            MoveCommand command = new MoveCommand(length, left, right);
+            commands.add(command);
+        }
 
-	@Override
-	public boolean checkSensor() {
-		System.out.println(finch.getLight(State.LeftDirection) + " " + finch.getLight(State.RightDirection));
-		return finch.getLight(State.LeftDirection) <= 90 && finch.getLight(State.RightDirection) <= 90;
-	}
+        goBack();
+    }
 
-	@Override
-	public void trigger() {
-		//trigger.interrupt();
-	}
+    private void goBack() {
+        System.out.println("Go backward");
+        turnAround();
 
-	public int getLights() {
-		return finch.getLight(State.LeftDirection);
-	}
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            MoveCommand command = commands.get(i);
+            int length = command.getLength();
+            int left = command.getLeftSpeed();
+            int right = command.getRightSpeed();
+
+            for (int j = 0; i < length; i++) {
+                finch.setMotors(left, right);
+            }
+        }
+    }
+
+    private void turnAround() {
+        // поворот на 180 через правое плечо
+        for (int i = 0; i < 30; i++) {
+            finch.setMotors(100, -100);
+        }
+    }
+
+    private boolean isInterrupted() {
+        int lightLimit = 90;
+//		System.out.println(finch.getLight(Direction.LEFT) + " " + finch.getLight(Direction.RIGHT));
+        return finch.getLight(Direction.LEFT) <= lightLimit && finch.getLight(Direction.RIGHT) <= lightLimit;
+    }
 }
