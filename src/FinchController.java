@@ -34,15 +34,12 @@ public class FinchController {
                 if (isInterrupted()) {
                     isActive = false;
                     length = i + 1;
-                    System.out.printf("%15d%15d%15d%n", length, left, right);
-                    MoveCommand command = new MoveCommand(length, left, right);
-                    commands.add(command);
                     break;
                 }
             }
 
-            System.out.printf("%15d%15d%15d%n", length, left, right);
             MoveCommand command = new MoveCommand(length, left, right);
+            System.out.println(command.getCommand());
             commands.add(command);
         }
 
@@ -50,18 +47,21 @@ public class FinchController {
     }
 
     private void goBack() {
+        double pauseTime = 0.5;
+
         System.out.println("Go backward");
-        finch.pause(0.2);
+
+        finch.pause(pauseTime);
         turnAround();
-        finch.pause(0.2);
+        finch.pause(pauseTime);
 
         for (int i = commands.size() - 1; i >= 0; i--) {
             MoveCommand command = commands.get(i);
+            System.out.println(command.getCommand());
+
             int length = command.getLength();
             int left = command.getRightSpeed(); // Зеркально, чтобы пойти по тому же пути
             int right = command.getLeftSpeed();
-
-            System.out.printf("%15d%15d%15d%n", length, left, right);
 
             for (int j = 0; j < length; j++) {
                 finch.setMotors(left, right);
@@ -71,7 +71,7 @@ public class FinchController {
 
     private void turnAround() {
         // поворот на 180 через правое плечо
-        for (int i = 0; i < 55; i++) {
+        for (int i = 0; i < 35; i++) {
             finch.setMotors(100, -100);
         }
     }

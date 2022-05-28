@@ -22,7 +22,7 @@ public class MoveCommand {
 		return length;
 	}
 
-	public String printCommand() {
+	public String getCommand() {
 		String result = "";
 
 		result += String.format("%15s", length);
